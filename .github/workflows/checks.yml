@@ -1,0 +1,19 @@
+name: consistency
+
+on: [push, pull_request]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - name: Manuscript numerical audit
+        run: python src/consistency_check.py
+      - name: Fold rotation invariants
+        run: python src/lso_rotation.py
+      - name: Figures regenerate without error
+        run: python figures/p5_figures.py

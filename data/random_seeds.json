@@ -1,0 +1,31 @@
+{
+  "_comment": [
+    "Random seeds for Urrea (2026), Sensors. Seed 42 is used throughout, matching",
+    "the convention stated in the companion papers of this series, so that a reader",
+    "comparing P1 and P5 need not wonder whether a discrepancy came from the method",
+    "or from the seed. Confirm each entry against your actual run before depositing.",
+    "model_init carries one seed per fold of the rotation in src/lso_rotation.py."
+  ],
+  "_schema_version": "1.0",
+  "cohort_sampling": 42,
+  "latin_square_assignment": 42,
+  "task_variation": {
+    "part_orientation": 42,
+    "bin_position": 42
+  },
+  "signal_synthesis": {
+    "semg_noise": 42,
+    "semg_amplitude_modulation": 42,
+    "imu_noise": 42,
+    "fsr_noise": 42
+  },
+  "degradations": {
+    "packet_dropout": 42,
+    "wireless_latency": 42
+  },
+  "fold_rotation": 42,
+  "model_init": [0, 1, 2, 3, 4, 5],
+  "hyperparameter_search": 42,
+  "bootstrap": 42,
+  "figure_generation": 42
+}
