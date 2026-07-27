@@ -1,0 +1,263 @@
+# =============================================================================
+# Simulation configuration
+#
+# Urrea, C. (2026). Real-Time Physiological Fatigue Prediction Using Wearable
+# Sensor Fusion and Hybrid Deep Learning for Human-Robot Collaborative
+# Manufacturing. Sensors, 26(XX), XXXXX.
+#
+# PROVENANCE NOTE. Every value below is transcribed from the published
+# manuscript, section by section, and each entry carries the section it came
+# from. It is therefore a faithful record of what the article states, but it is
+# not an export from the simulator. Before depositing, diff it against the
+# configuration your CoppeliaSim run actually used and correct any divergence
+# here rather than in the paper. Parameters the article does not specify are
+# marked TODO and must be filled from your run.
+# =============================================================================
+
+metadata:
+  schema_version: "1.0"
+  paper_doi: "10.3390/sXXXXXXXX"
+  repository: "https://github.com/ClaudioUrrea/CNNLSTM-Wearable-FatiguePrediction"
+  license: "CC-BY-4.0"
+
+# --- Section 6.2: Simulation Environment -------------------------------------
+environment:
+  simulator: "CoppeliaSim"
+  simulator_version: "4.5"
+  physics_engine: "Bullet Physics"
+  physics_version: "2.83"
+  forward_dynamics_rate_hz: 200
+  workspace_envelope_m: {x: 6.0, y: 4.0, z: 3.0}
+  contact_model: "metal-on-metal"
+  contact_parameters:
+    friction_coefficient: TODO        # not stated in the article
+    restitution: TODO                 # not stated in the article
+
+robots:
+  count: 3
+  model: "UR5e"
+  arrangement: "radial about a central workstation"
+  angular_spacing_deg: 120
+  kinematic_parameters: "manufacturer-specified"
+  dynamic_parameters: "manufacturer-specified"
+  collision_geometry: "retained, for ISO/TS 15066 separation monitoring"
+  base_poses:                         # TODO: exact poses from your scene
+    - {id: 1, x_m: TODO, y_m: TODO, z_m: TODO, yaw_deg: 0}
+    - {id: 2, x_m: TODO, y_m: TODO, z_m: TODO, yaw_deg: 120}
+    - {id: 3, x_m: TODO, y_m: TODO, z_m: TODO, yaw_deg: 240}
+
+digital_human:
+  dof_total: 23
+  dof_breakdown:                      # Section 5.1
+    shoulder_per_side: 3              # flex/ext, abd/add, int/ext rotation
+    elbow_per_side: 2                 # flex/ext, pronation/supination
+    wrist_per_side: 2                 # flex/ext, radial/ulnar deviation
+    upper_limbs_bilateral: 14
+    trunk: 3                          # flex/ext, lateral bending, axial rotation
+    pelvis_root: 6                    # free-floating root segment
+  musculoskeletal_model: "OpenSim, upper extremity after Holzbaur et al."
+  muscle_actuators: 92
+  control: "Lua scripts acting on the 23-DOF chain"
+  motion_source: "CMU Graphics Lab Motion Capture Database, retargeted"
+  scaling: "segment lengths and inertial properties scaled per operator"
+
+# --- Section 6.2: Assembly task ----------------------------------------------
+assembly_cycle:
+  subtasks: [part_retrieval, fastener_installation, inspection, packaging]
+  part_mass_kg: {min: 0.5, max: 3.0}
+  reach_distance_cm: {min: 40, max: 80}
+  fasteners_per_assembly: 12
+  fastener_torque_nm: 20
+  part_orientations: 8
+  bin_positions: 8
+
+# --- Section 6.4: Experimental protocol --------------------------------------
+protocol:
+  operators: 24
+  sessions_per_operator: 8
+  sessions_baseline: 4
+  sessions_intervention: 4
+  total_sessions: 192
+  session_duration_h: 8
+  total_operational_hours: 1536
+  virtual_weeks: 4
+  inter_session_washout_h: 48
+  session_order: "Latin square randomisation"
+  breaks:
+    - {at_h: 2, duration_min: 15}
+    - {at_h: 4, duration_min: 30}
+    - {at_h: 6, duration_min: 15}
+  baseline_arm:
+    fatigue_response: "reactive"
+    velocity_scaling: "0.7 + 0.3 * (1 - f)"   # f in [0,1]
+  intervention_arm:
+    trigger_conditions:
+      - {metric: "MVC", threshold_pct: 70, sustained_s: 45}
+      - {metric: "cumulative_shoulder_moment", threshold_nm_h: 15}
+    note: >-
+      The 15 Nm h threshold has no direct counterpart in the ACGIH threshold
+      limit values, which address lifting and hand activity and not accumulated
+      shoulder moment. It is a working value adopted by analogy with the
+      cumulative-exposure logic those limits embody.
+    strategies:
+      - {name: "task_redistribution_to_cobot", shoulder_load_reduction_pct: 40}
+      - {name: "microbreak", duration_min: 2, every_min: 30}
+      - {name: "bin_height_adjustment", shoulder_flexion_reduction_deg: 25}
+
+# --- Section 4.1: Sensor hardware emulated -----------------------------------
+sensors:
+  semg:
+    model: "Delsys Trigno"
+    channels: 8
+    sampling_hz: 1000
+    resolution_bits: 16
+    amplitude_sensitivity_uv: 1
+    bandwidth_hz: {low: 20, high: 450}
+    cmrr_db_min: 100
+    electrode: {type: "bipolar Ag/AgCl", diameter_mm: 10, spacing_mm: 20}
+    muscles_bilateral:
+      - biceps_brachii
+      - anterior_deltoid
+      - flexor_carpi_radialis
+      - upper_trapezius
+    placement_standard: "SENIAM"
+  imu:
+    model: "Xsens MTw Awinda"
+    units: 6
+    sampling_hz: 100
+    accelerometer_range_g: 16
+    gyroscope_range_dps: 2000
+    fusion_filter: "Madgwick"
+    madgwick_beta: 0.1
+    static_accuracy_deg_rms: 1.0
+    locations: [upper_arm_L, upper_arm_R, forearm_L, forearm_R, sternum, sacrum]
+  fsr:
+    model: "Tekscan FlexiForce A201"
+    sensors: 4
+    sampling_hz: 500
+    range_n: {min: 0, max: 110}
+    resolution_n: 0.5
+    locations: [tool_handle_1, tool_handle_2, assembly_gripper, workstation_surface]
+
+# --- Section 6.3: Synthetic signal generation --------------------------------
+signal_synthesis:
+  semg:
+    stages: ["static optimisation -> activation a_i(t)",
+             "excitation-contraction coupling",
+             "surface potential generation"]
+    activation_time_constant_ms: 30
+    muscle_gain_mv: {min: 0.8, max: 1.2}
+    amplitude_modulation_sigma: 0.15
+    snr_db: 24
+    model: "EMG_i(t) = sqrt(a_i(t)) * G_i * N(0, sigma^2) + n(t)"
+  imu:
+    source: "forward kinematics"
+    accel_noise_sigma_m_s2: 0.01
+    gyro_noise_sigma_dps: 0.1
+  fsr:
+    source: "contact dynamics"
+    piezoresistive_nonlinearity: true
+    measurement_noise_n: 0.5
+  degradations:
+    packet_dropout_pct: {semg: 1.7, imu: 0.9, fsr: 2.2}
+    wireless_latency: {distribution: "exponential", lambda_ms: 50}
+
+# --- Section 4.3: Signal conditioning ----------------------------------------
+conditioning:
+  semg:
+    bandpass: {type: "Butterworth", order: 4, low_hz: 20, high_hz: 450}
+    notch: {type: "IIR", order: 2, freq_hz: 50, bandwidth_hz: 2}
+    envelope: {method: "RMS", window_ms: 200}
+    spectral: {method: "STFT", window: "Hamming", window_ms: 500, overlap_pct: 50}
+  imu:
+    gravity_removal: "rotation into global frame"
+    lowpass: {type: "Butterworth", order: 5, cutoff_hz: 5}
+    jerk: {method: "Savitzky-Golay", polyorder: 3, frame_length: 11}
+  fsr:
+    linearisation: "per-channel calibration curve"
+    median_filter_samples: 5
+    saturation_flag_n: 110
+  synchronisation:
+    method: "cross-correlation of sEMG onset and IMU acceleration transients"
+    residual_skew_ms_max: 5
+
+# --- Sections 4.4 and 5.1: Windowing -----------------------------------------
+windowing:
+  window_s: 30
+  stride_s: 15
+  overlap_pct: 50
+  feature_dimension: 127
+  features_by_block:
+    semg_time_domain: 40        # 5 descriptors x 8 channels
+    semg_frequency_domain: 24   # MDF, MNF, fatigue index x 8 channels
+    imu_kinematics: 36          # 6 descriptors x 6 units
+    biomechanical: 12
+    fsr_force_dynamics: 12      # 3 descriptors x 4 sensors
+    contextual: 3
+  normalisation: "per-subject z-score from that subject's baseline period"
+  windows_per_session_gross: 1680     # 7 h of task time at 15 s stride
+  windows_discarded_pct: 8.6          # break boundaries and quality flags
+  windows_per_session_retained: 1536
+  windows_per_operator: 12288
+  windows_pooled: 294912
+
+# --- Section 5.1: Labelling ---------------------------------------------------
+labels:
+  source: "internal simulation state, cumulative normalised muscle activation"
+  classes:
+    fresh: {fdi_max: 40}
+    moderate: {fdi_min: 40, fdi_max: 70}
+    severe: {fdi_min: 70}
+  class_priors: {fresh: 0.45, moderate: 0.38, severe: 0.17}
+
+# --- Sections 5.2 to 5.4: Models and training --------------------------------
+models:
+  random_forest: {n_estimators: 200, max_depth: 15, max_features: 11}
+  svm: {kernel: "rbf", C: 10, gamma: 0.01, multiclass: "ovr",
+        probability_calibration: "Platt"}
+  xgboost: {n_estimators: 300, learning_rate: 0.05, max_depth: 8,
+            reg_lambda: 1.0, early_stopping: true}
+  lstm:
+    layers: [128, 64]
+    sequence_length: 6            # spans 105 s of elapsed time
+    dropout: 0.3
+    optimiser: "Adam"
+    learning_rate: 0.001
+    loss: "categorical cross-entropy"
+  cnn_lstm_hybrid:
+    conv_filters: [64, 32]
+    conv_kernel_sizes: [5, 3]
+    batch_norm: true
+    pooling: "max"
+    lstm_units: 64
+    dense_units: 32
+    sequence_length: 6
+
+training:
+  partition: "leave-subjects-out"
+  operators_train: 16
+  operators_validation: 4
+  operators_test: 4
+  rotation_folds: 6
+  rotation_note: >-
+    Each operator is held out for testing exactly once and used for validation
+    exactly once. All reported metrics are pooled over the six out-of-fold test
+    sets. See src/lso_rotation.py.
+  class_weighting:
+    scheme: "inverse frequency, normalised so weights sum to K = 3"
+    weights: {fresh: 0.62, moderate: 0.74, severe: 1.64}
+  max_epochs: 50
+  batch_size: 32
+  early_stopping_patience: 10
+  hyperparameter_search:
+    classical: "grid search, 5-fold operator-level CV on the training partition"
+    neural: "Bayesian optimisation"
+
+evaluation:
+  metrics: [accuracy, balanced_accuracy, precision, recall, macro_f1, auc_ovr]
+  confidence_interval:
+    method: "cluster bootstrap over operators"
+    resamples: 1000
+    level: 0.95
+  latency_platform: "NVIDIA Jetson Nano"
+  realtime_budget_ms: 100

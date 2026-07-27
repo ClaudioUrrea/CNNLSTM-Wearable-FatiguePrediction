@@ -1,0 +1,28 @@
+{
+  "title": "Real-Time Physiological Fatigue Prediction Using Wearable Sensor Fusion and Hybrid Deep Learning for Human-Robot Collaborative Manufacturing",
+  "upload_type": "software",
+  "creators": [
+    {
+      "name": "Urrea, Claudio",
+      "orcid": "0000-0001-7197-8928",
+      "affiliation": "University of Santiago of Chile"
+    }
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": [
+    "wearable sensors",
+    "surface electromyography",
+    "fatigue prediction",
+    "human-robot collaboration",
+    "digital twin",
+    "Industry 5.0"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.3390/sXXXXXXXX",
+      "relation": "isSupplementTo",
+      "scheme": "doi"
+    }
+  ]
+}

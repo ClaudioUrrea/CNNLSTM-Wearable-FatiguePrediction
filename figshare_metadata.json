@@ -1,0 +1,28 @@
+{
+  "title": "Real-Time Physiological Fatigue Prediction Using Wearable Sensor Fusion and Hybrid Deep Learning for Human-Robot Collaborative Manufacturing: code, cohort specification and simulation configuration",
+  "description": "Materials supporting the Sensors (2026) article of the same name. The study is entirely in silico: 24 synthetic operator models, each carrying a 23-degree-of-freedom musculoskeletal model, perform 8-hour collaborative assembly shifts in a CoppeliaSim cell with three UR5e manipulators, and their sEMG, IMU and force signals are generated from the underlying biomechanics. No human participant was recorded at any stage. This deposit contains the figure generation code, the six-fold leave-subjects-out rotation, the operator-level cluster bootstrap, an automated numerical audit of every quantity reported in the article, the 24-operator cohort specification, the simulation configuration, the random seeds and the trained model weights. The 294,912-window feature array is regenerated deterministically from these inputs rather than archived directly.",
+  "keywords": [
+    "wearable sensors",
+    "surface electromyography",
+    "fatigue prediction",
+    "machine learning",
+    "human-robot collaboration",
+    "digital twin",
+    "sensor fusion",
+    "Industry 5.0",
+    "occupational biomechanics"
+  ],
+  "categories_by_source_id": ["400207", "400103"],
+  "license": 1,
+  "defined_type": "software",
+  "authors": [
+    {
+      "name": "Claudio Urrea",
+      "orcid_id": "0000-0001-7197-8928"
+    }
+  ],
+  "references": [
+    "https://doi.org/10.3390/sXXXXXXXX"
+  ],
+  "funding": "This research received no external funding."
+}
