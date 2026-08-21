@@ -3,7 +3,7 @@
 Code and materials accompanying:
 
 > Urrea, C. (2026). Real-Time Physiological Fatigue Prediction Using Wearable Sensor
-> Fusion and Hybrid Deep Learning for Human–Robot Collaborative Manufacturing.
+> Fusion and Hybrid DeepLearning: An In Silico Digital Twin Study.
 > *Sensors*, 26(XX), XXXXX. https://doi.org/10.3390/sXXXXXXXX
 
 [![DOI](https://img.shields.io/badge/DOI-pending-blue.svg)](https://doi.org/10.6084/m9.figshare.XXXXXXX)
