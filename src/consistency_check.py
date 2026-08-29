@@ -37,7 +37,7 @@ def check_exact(name: str, got, expected) -> None:
 
 
 # --------------------------------------------------------------------------
-# 1. Dataset arithmetic (Sections 5.1 and 6.4)
+# 1. Dataset arithmetic (Sections 4.1 and 6.5)
 # --------------------------------------------------------------------------
 print("\n--- dataset arithmetic ---")
 N_OPERATORS, SESSIONS_PER_OP, SESSION_HOURS = 24, 8, 8
@@ -58,7 +58,7 @@ POOLED = WINDOWS_PER_SESSION * SESSIONS_PER_OP * N_OPERATORS
 check_exact("pooled out-of-fold windows", POOLED, 294_912)
 
 # --------------------------------------------------------------------------
-# 2. Feature vector (Section 4.3, Table 2)
+# 2. Feature vector (Section 3.4, Table 2)
 # --------------------------------------------------------------------------
 print("\n--- feature vector ---")
 features = {"sEMG time-domain": 5 * 8, "sEMG frequency-domain": 3 * 8,
@@ -69,7 +69,7 @@ check_exact("feature vector dimension", sum(features.values()), 127)
 check_exact("non-biomechanical features", 127 - features["biomechanical"], 115)
 
 # --------------------------------------------------------------------------
-# 3. Class weighting (Section 5.4)
+# 3. Class weighting (Section 4.3)
 # --------------------------------------------------------------------------
 print("\n--- class weighting ---")
 p = np.array([0.45, 0.38, 0.17])
@@ -79,7 +79,7 @@ for label, value, expected in zip(("fresh", "moderate", "severe"), w, (0.62, 0.7
     check(f"class weight, {label}", float(value), expected, tol=6e-3)
 
 # --------------------------------------------------------------------------
-# 4. Confusion matrix (Figure 4a) and Table 4
+# 4. Confusion matrix (Figure 5a) and Table 6
 # --------------------------------------------------------------------------
 print("\n--- confusion matrix ---")
 cm = np.array([[124_074, 7_158, 1_476],
@@ -98,7 +98,7 @@ bal = float(np.mean(diag / row))
 f1 = 2 * (diag / col) * (diag / row) / ((diag / col) + (diag / row))
 check("overall accuracy", acc * 100, 89.3, tol=0.05)
 check("balanced accuracy", bal * 100, 87.1, tol=0.05)
-check("macro F1 (Table 4)", float(f1.mean()) * 100, 87.7, tol=0.05)
+check("macro F1 (Table 6)", float(f1.mean()) * 100, 87.7, tol=0.05)
 check("severe-class F1", float(f1[2]) * 100, 82.0, tol=0.1)
 
 check("class prior, fresh", float(row[0] / cm.sum()) * 100, 45.0, tol=0.1)
@@ -165,7 +165,7 @@ check("Youden point, sensitivity", float(tpr_curve[j]) * 100, 85.2, tol=0.1)
 check("Youden point, specificity", (1 - float(fpr_curve[j])) * 100, 93.4, tol=0.1)
 
 # --------------------------------------------------------------------------
-# 7. Intervention effects (Table 5, Figure 7)
+# 7. Intervention effects (Table 10, Figure 10)
 # --------------------------------------------------------------------------
 print("\n--- intervention effects ---")
 rows = {
@@ -183,7 +183,7 @@ for name, (m0, s0, m1, s1, pct, d) in rows.items():
 check("throughput retained", 7.3 / 7.8 * 100, 94.0, tol=0.5)
 
 # --------------------------------------------------------------------------
-# 8. Synthetic cohort (Table 3, Section 6.1)
+# 8. Synthetic cohort (Table 3, Section 6.2)
 # --------------------------------------------------------------------------
 print("\n--- synthetic cohort ---")
 check("BMI implied by mean height and mass", 71.2 / (1.673 ** 2), 25.4, tol=0.1)
@@ -197,14 +197,41 @@ check("endurance coefficient of variation (%)", 48.0 / 142.0 * 100, 34.0, tol=0.
 check_exact("phenotype cluster sizes", 7 + 10 + 7, N_OPERATORS)
 
 # --------------------------------------------------------------------------
-# 9. Latency budget (Section 4.2)
+# 9. Latency budget (Section 3.2)
 # --------------------------------------------------------------------------
 print("\n--- latency budget ---")
 low = [0, 20, 5, 15, 15, 22]
 high = [10, 50, 15, 15, 15, 22]
 check_exact("end-to-end latency, lower bound (ms)", sum(low) + 10, 87)
 check_exact("end-to-end latency, upper bound (ms)", sum(high), 127)
-check_exact("inference within the 100 ms real-time budget", 22 < 100, True)
+check_exact("hybrid inference within the 100 ms control budget", 22 < 100, True)
+check_exact("slowest architecture still inside the control budget", 39 < 100, True)
+check_exact("measured inference range across the eight models (ms)", (8, 39), (8, 39))
+# Section 3.2, third round: with inference hosted on the gateway the WiFi relay
+# is removed, and INT8 quantisation takes inference from 22 ms to 14 ms.
+check_exact("hard-bound configuration, lower bound (ms)",
+            sum(low) + 10 - 5 - (22 - 14), 74)
+check_exact("hard-bound configuration, upper bound (ms)",
+            sum(high) - 15 - (22 - 14), 104)
+
+# --------------------------------------------------------------------------
+# 10. Intervention trigger policy (Section 6.5, Figures 9 and 10)
+# --------------------------------------------------------------------------
+print("\n--- intervention trigger policy ---")
+ALERT_P, WARN_P = 0.70, 0.50           # Figure 9: alert line and warning line
+MVC_FRACTION, MVC_SECONDS = 0.70, 45   # reactive threshold 1
+CUMULATIVE_NM_H = 15.0                 # reactive threshold 2
+check_exact("alert probability threshold", ALERT_P, 0.70)
+check_exact("warning level (no reallocation requested)", WARN_P, 0.50)
+check_exact("warning level below alert level", WARN_P < ALERT_P, True)
+check("70% MVC line drawn on the baseline peak moment (Nm)",
+      18.3 * MVC_FRACTION, 12.81, tol=0.01)
+check_exact("cumulative-moment trigger (Nm h)", CUMULATIVE_NM_H, 15.0)
+check_exact("trigger evaluated once per stride", STRIDE_S, 15)
+# The reactive tier fires on the same condition that defines an injury-risk
+# event (Section 7.8), so it can shorten such an event but not prevent one.
+check_exact("reactive threshold 1 matches the injury-event definition",
+            (MVC_FRACTION, MVC_SECONDS), (0.70, 45))
 
 # --------------------------------------------------------------------------
 print("\n" + "=" * 78)

@@ -199,7 +199,7 @@ def check_accuracy(path: Path, cohort: Path) -> None:
        near(hi, PUBLISHED["phenotype_accuracy"]["resistant"], 1.0):
         ok(f"{path.name}: accuracy spread [{lo:.1f}, {hi:.1f}]%")
 
-    # Cross-check the phenotype ordering reported in Section 7.2.
+    # Cross-check the phenotype ordering reported in Section 7.3.
     if cohort.exists():
         ph = {int(r["operator_id"]): r["phenotype"].strip().lower()
               for r in csv.DictReader(cohort.open())}

@@ -1,5 +1,5 @@
 """
-Operator-level cluster bootstrap (Section 5.5).
+Operator-level cluster bootstrap (Section 4.5).
 
 The pooled out-of-fold set holds 294,912 windows, but they are not 294,912
 independent observations. Consecutive windows overlap by 50%, windows within a
@@ -73,7 +73,10 @@ def naive_window_bootstrap_ci(
 if __name__ == "__main__":
     # Per-operator out-of-fold accuracies are the study's own output and belong
     # in data/per_operator_accuracy.csv. The phenotype structure reported in
-    # Section 7.2 is used here only to illustrate the machinery.
+    # Section 7.3 is used here only to illustrate the machinery. The interval it
+    # produces is not the one published: Table 4 gives [87.8, 90.8] for the
+    # hybrid, computed from the 24 individual out-of-fold accuracies rather than
+    # from three phenotype means.
     phenotypes = {"fast": (7, 85.1), "average": (10, 89.8), "resistant": (7, 92.8)}
     values, weights = [], []
     for n_ops, acc in phenotypes.values():

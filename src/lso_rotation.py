@@ -1,5 +1,5 @@
 """
-Leave-subjects-out (LSO) rotation used in Section 5.4 of the manuscript.
+Leave-subjects-out (LSO) rotation used in Section 4.3 of the manuscript.
 
 The 24 synthetic operators are split into six disjoint blocks of four. For
 fold i the test set is block i and the validation set is block i+1 (mod 6),
@@ -63,7 +63,7 @@ def make_blocks(operator_ids: Sequence[int], seed: int = 42) -> list[tuple[int, 
 
 
 def iter_folds(operator_ids: Sequence[int], seed: int = 42) -> Iterator[Fold]:
-    """Yield the six folds described in Section 5.4."""
+    """Yield the six folds described in Section 4.3."""
     blocks = make_blocks(operator_ids, seed=seed)
     for i in range(N_FOLDS):
         test = blocks[i]
