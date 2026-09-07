@@ -1,7 +1,8 @@
 cff-version: 1.2.0
 title: >-
-  Real-Time Physiological Fatigue Prediction Using Wearable Sensor Fusion and
-  Hybrid Deep Learning for Human-Robot Collaborative Manufacturing
+ Real-Time Physiological Fatigue Prediction for Human–Robot
+ Collaborative Manufacturing Using Wearable Sensor Fusion and
+ Hybrid Deep Learning: An In Silico Digital Twin Study
 message: Please cite the journal article when using this software or data.
 type: software
 authors:
@@ -26,8 +27,9 @@ keywords:
 preferred-citation:
   type: article
   title: >-
-    Real-Time Physiological Fatigue Prediction Using Wearable Sensor Fusion and
-    Hybrid Deep Learning for Human-Robot Collaborative Manufacturing
+    Real-Time Physiological Fatigue Prediction for Human–Robot
+    Collaborative Manufacturing Using Wearable Sensor Fusion and
+    Hybrid Deep Learning: An In Silico Digital Twin Study
   authors:
     - given-names: Claudio
       family-names: Urrea
