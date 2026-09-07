@@ -7,7 +7,8 @@ Code and materials accompanying:
 > *Sensors*, 2026, 26, 5556. 
 https://doi.org/10.3390/s26175556
 
-[![DOI](https://img.shields.io/badge/DOI-10.6084%2Fm9.figshare.33095672-blue.svg)](https://doi.org/10.6084/m9.figshare.33095672)
+[![Article DOI](https://img.shields.io/badge/article-10.3390%2Fs26175556-blue.svg)](https://doi.org/10.3390/s26175556)
+[![Data DOI](https://img.shields.io/badge/data-10.6084%2Fm9.figshare.33095672-blue.svg)](https://doi.org/10.6084/m9.figshare.33095672)
 [![License: MIT](https://img.shields.io/badge/code-MIT-green.svg)](LICENSE)
 [![License: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-lightgrey.svg)](LICENSE-DATA.md)
 
