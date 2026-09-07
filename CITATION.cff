@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 title: >-
- Real-Time Physiological Fatigue Prediction for Human–Robot
- Collaborative Manufacturing Using Wearable Sensor Fusion and
- Hybrid Deep Learning: An In Silico Digital Twin Study
+  Real-Time Physiological Fatigue Prediction for Human–Robot
+  Collaborative Manufacturing Using Wearable Sensor Fusion and
+  Hybrid Deep Learning: An In Silico Digital Twin Study
 message: Please cite the journal article when using this software or data.
 type: software
 authors:
@@ -15,8 +15,16 @@ authors:
       University of Santiago of Chile
 repository-code: https://github.com/ClaudioUrrea/CNNLSTM-Wearable-FatiguePrediction
 license: MIT
-version: 1.0.0
-date-released: 2026-07-27
+version: 1.1.0
+date-released: 2026-08-31
+doi: 10.6084/m9.figshare.33095672
+identifiers:
+  - type: doi
+    value: 10.6084/m9.figshare.33095672
+    description: Archived code and data deposit (Figshare)
+  - type: doi
+    value: 10.3390/s26175556
+    description: Published journal article
 keywords:
   - wearable sensors
   - surface electromyography
@@ -37,4 +45,7 @@ preferred-citation:
   journal: Sensors
   year: 2026
   volume: 26
-  doi: 10.3390/sXXXXXXXX
+  issue: 17
+  number: 5556
+  doi: 10.3390/s26175556
+  url: https://doi.org/10.3390/s26175556
